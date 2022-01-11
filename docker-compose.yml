@@ -16,7 +16,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
     volumes:
-      - ./db:/var/lib/mysql
+      - mysqlDB:/var/lib/mysql
 
   phpmyadmin:
       image: phpmyadmin
@@ -51,4 +51,6 @@ services:
   #   links:
   #     - backend
   #   # ...
-  
+
+volumes:
+  mysqlDB:
