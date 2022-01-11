@@ -1,0 +1,7 @@
+{
+    "name": "Server container",
+    "dockerFile": "./Dockerfile",
+    "shutdownAction": "none",
+    "extensions": [],
+    "workspaceFolder": "/workspace/server",
+  }
