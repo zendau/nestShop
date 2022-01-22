@@ -19,7 +19,7 @@ export class AppController {
 
   @Get('/test')
   async getHello2() {
-    const res = await this.client2.send('test', 'hello23');
+    const res = await this.client2.send('test', '');
     console.log(res);
     return res;
   }

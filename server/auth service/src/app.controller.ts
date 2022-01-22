@@ -16,7 +16,7 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @MessagePattern('test')
+  @MessagePattern('test2')
   async handleUserCreated(@Payload() data: string, @Ctx() context: RmqContext) {
     console.log(data);
     console.log(context);
