@@ -6,20 +6,21 @@ import {
   RmqContext,
 } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import { User } from './users/users.entity';
+import { UsersService } from './users/users.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private UsersService: UsersService,
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
-  }
-
-  @MessagePattern('test2')
-  async handleUserCreated(@Payload() data: string, @Ctx() context: RmqContext) {
-    console.log(data);
-    console.log(context);
-    return data + data;
+  @MessagePattern('auth/register')
+  async registerUser(@Payload() userData: User) {
+    console.log('1', userData);
+    const res = await this.UsersService.create(userData);
+    console.log('2', res);
+    return res;
   }
 }
