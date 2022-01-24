@@ -1,12 +1,15 @@
-import { IsEmail, IsString, Max, Min } from 'class-validator';
+import { IsEmail, IsString, Length } from 'class-validator';
 
 export class LoginData {
+  @Length(6, 20, {
+    message: 'email is smaller than 6 signs and bigger than 20 signs',
+  })
   @IsEmail({ message: 'Is not email' })
-  @Min(0, { message: 'Value is empty' })
-  @Max(15, { message: 'Value is bigger then 15' })
   email: string;
+
+  @Length(6, 20, {
+    message: 'password is smaller than 6 signs and bigger than 20 signs',
+  })
   @IsString({ message: 'Is not currect string' })
-  @Min(0, { message: 'Value is empty' })
-  @Max(15, { message: 'Value is bigger then 15' })
   password: string;
 }

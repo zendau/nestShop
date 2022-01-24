@@ -1,16 +1,19 @@
-import { IsEmail, IsString, Max, Min } from 'class-validator';
+import { IsEmail, IsString, Length, Max, Min } from 'class-validator';
 
 export class RegisterData {
   @IsEmail({ message: 'Is not email' })
-  @Min(0, { message: 'Value is empty' })
-  @Max(15, { message: 'Value is bigger then 15' })
+  @Length(6, 20, {
+    message: 'email is smaller than 6 signs and bigger than 20 signs',
+  })
   email: string;
   @IsString({ message: 'Is not currect string' })
-  @Min(0, { message: 'Value is empty' })
-  @Max(15, { message: 'Value is bigger then 15' })
+  @Length(6, 20, {
+    message: 'password is smaller than 6 signs and bigger than 20 signs',
+  })
   password: string;
   @IsString({ message: 'Is not currect string' })
-  @Min(0, { message: 'Value is empty' })
-  @Max(15, { message: 'Value is bigger then 15' })
+  @Length(6, 20, {
+    message: 'password is smaller than 6 signs and bigger than 20 signs',
+  })
   confirmPassword: string;
 }

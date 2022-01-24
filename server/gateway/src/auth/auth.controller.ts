@@ -1,3 +1,4 @@
+import { ValidationPipe } from './../pipes/validation.pipe';
 import { RegisterData } from './dto/register.dto';
 import {
   Body,
@@ -7,6 +8,7 @@ import {
   Inject,
   Post,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -30,6 +32,7 @@ export class AuthController {
     return res;
   }
 
+  @UsePipes(ValidationPipe)
   @Post('login')
   async login(@Body() authBody: LoginData) {
     const res = await firstValueFrom(
