@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(
     private readonly appService: AppService,
+    private AppService: AppService,
     @Inject('SHOP_SERVICE') private client: ClientProxy,
     @Inject('AUTH_SERVICE') private client2: ClientProxy,
   ) {}
