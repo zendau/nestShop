@@ -1,6 +1,10 @@
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Role } from './enum/role.enum';
+import { Roles } from './decorators/roles.decorator';
+import { RolesGuard } from './guards/roles.guard';
 
 @Controller()
 export class AppController {
@@ -11,11 +15,11 @@ export class AppController {
     @Inject('AUTH_SERVICE') private client2: ClientProxy,
   ) {}
 
+  @Roles(Role.Admin, Role.User)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   async getHello() {
-    const res = await this.client.send('test', 'hello');
-    console.log(res);
-    return res;
+    return true;
   }
 
   @Get('/test')

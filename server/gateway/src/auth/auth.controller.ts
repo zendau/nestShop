@@ -1,4 +1,4 @@
-import { ValidationPipe } from './../pipes/validation.pipe';
+import { ValidationPipe } from '../pipes/validation.pipe';
 import { RegisterData } from './dto/register.dto';
 import {
   Body,
@@ -11,7 +11,7 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { first, firstValueFrom, map, Observable } from 'rxjs';
 import { LoginData } from './dto/login.dto';
 
