@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TokenModule } from './token/token.module';
 import { ConfigModule } from '@nestjs/config';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ConfigModule } from '@nestjs/config';
       autoLoadEntities: true,
       synchronize: true,
     }),
+    RoleModule,
   ],
   controllers: [AppController],
   providers: [AppService, UsersService],
