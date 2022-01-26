@@ -1,3 +1,4 @@
+import { RoleController } from './RoleService/role.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './AuthService/auth.controller';
 import { Module } from '@nestjs/common';
@@ -35,7 +36,7 @@ import { Role } from './role';
       },
     ]),
   ],
-  controllers: [AppController, AuthController],
+  controllers: [AppController, AuthController, RoleController],
   providers: [AppService, JwtStrategy, Role],
   exports: [ClientsModule],
 })

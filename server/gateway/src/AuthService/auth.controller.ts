@@ -19,6 +19,7 @@ import { LoginData } from './dto/login.dto';
 export class AuthController {
   constructor(@Inject('AUTH_SERVICE') private authServiceClient: ClientProxy) {}
 
+  @UsePipes(ValidationPipe)
   @Post('register')
   async register(@Body() authBody: RegisterData) {
     const res = await firstValueFrom(
