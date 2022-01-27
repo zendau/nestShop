@@ -1,3 +1,4 @@
+import { userRoleDataDTO } from './dto/userRole.dto';
 import { editRoleDataDTO } from './dto/editRoleData.dto';
 import { roleDataDTO } from './dto/roleData.dto';
 import {
@@ -8,18 +9,23 @@ import {
   HttpException,
   Inject,
   Param,
+  Patch,
   Post,
-  Put,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
-
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { HttpErrorDTO } from 'src/globalDTO/httpError.dto';
+@ApiTags('Auth microservice - Role controller')
 @Controller('role')
 export class RoleController {
   constructor(@Inject('AUTH_SERVICE') private authServiceClient: ClientProxy) {}
 
+  @ApiOperation({ summary: 'Register new role' })
+  @ApiResponse({ status: 200, type: roleDataDTO })
+  @ApiResponse({ status: 400, type: HttpErrorDTO })
   @UsePipes(ValidationPipe)
   @Post('add')
   async addNewRole(@Body() roleData: roleDataDTO) {
@@ -27,14 +33,14 @@ export class RoleController {
     const res = await firstValueFrom(
       this.authServiceClient.send('role/add', roleData),
     );
-
+    console.log(res);
     if (res.status === false) {
       throw new HttpException(res.message, res.httpCode);
     }
     return res;
   }
 
-  @Put('edit')
+  @Patch('edit')
   async editRole(@Body() roleData: editRoleDataDTO) {
     const res = await firstValueFrom(
       this.authServiceClient.send('role/edit', roleData),
@@ -71,7 +77,7 @@ export class RoleController {
   }
 
   @Post('setUserRole')
-  async addUserRole(@Body() userRoleData: roleDataDTO) {
+  async addUserRole(@Body() userRoleData: userRoleDataDTO) {
     const res = await firstValueFrom(
       this.authServiceClient.send('role/setUserRole', userRoleData),
     );
@@ -82,8 +88,8 @@ export class RoleController {
     return res;
   }
 
-  @Put('editUserRole')
-  async editUserRole(@Body() userRoleData: roleDataDTO) {
+  @Patch('editUserRole')
+  async editUserRole(@Body() userRoleData: userRoleDataDTO) {
     const res = await firstValueFrom(
       this.authServiceClient.send('role/editUserRole', userRoleData),
     );
@@ -95,9 +101,9 @@ export class RoleController {
   }
 
   @Get('getUsersRole/:roleId')
-  async getUserRoles(@Param() roleId: number) {
+  async getUsersRole(@Param() param) {
     const res = await firstValueFrom(
-      this.authServiceClient.send('role/getUsersRole', roleId),
+      this.authServiceClient.send('role/getUsersRole', param.roleId),
     );
 
     if (res.status === false) {
