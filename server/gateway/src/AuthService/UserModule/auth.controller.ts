@@ -1,4 +1,4 @@
-import { ValidationPipe } from '../pipes/validation.pipe';
+import { ValidationPipe } from '../../pipes/validation.pipe';
 import { RegisterData } from './dto/register.dto';
 import {
   Body,
@@ -12,13 +12,19 @@ import {
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { first, firstValueFrom, map, Observable } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { LoginData } from './dto/login.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { HttpErrorDTO } from '../dto/httpError.dto';
 
+@ApiTags('Auth microservice - User controller')
 @Controller('auth')
 export class AuthController {
   constructor(@Inject('AUTH_SERVICE') private authServiceClient: ClientProxy) {}
 
+  @ApiOperation({ summary: 'Register new user' })
+  @ApiResponse({ status: 200, type: RegisterData })
+  @ApiResponse({ status: 400, type: HttpErrorDTO })
   @UsePipes(ValidationPipe)
   @Post('register')
   async register(@Body() authBody: RegisterData) {
@@ -33,6 +39,9 @@ export class AuthController {
     return res;
   }
 
+  @ApiOperation({ summary: 'Login user' })
+  @ApiResponse({ status: 200, type: LoginData })
+  @ApiResponse({ status: 400, type: HttpErrorDTO })
   @UsePipes(ValidationPipe)
   @Post('login')
   async login(@Body() authBody: LoginData) {
