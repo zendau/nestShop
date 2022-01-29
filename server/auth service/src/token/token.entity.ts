@@ -16,6 +16,6 @@ export class Token {
   @JoinColumn()
   userId: number;
 
-  @Column()
+  @Column('text')
   refreshToken: string;
 }

@@ -91,11 +91,14 @@ export class UsersService {
   }
 
   private async findByEmail(email: string) {
-    const user = await this.usersRepository
+    const user: any = await this.usersRepository
       .createQueryBuilder('u')
-      .leftJoinAndSelect('u.roleId', 'r')
+      .select(['u.id', 'u.email', 'u.password', 'r.id', 'r.value', 'r.desc'])
+      .innerJoinAndSelect('u.roleId', 'ur')
+      .innerJoinAndSelect('ur.role', 'r')
       .where('u.email = :email', { email })
       .getOne();
+    user.roleId = user.roleId[0].role;
     // const user = await this.usersRepository.find({
     //   where: {
     //     email,

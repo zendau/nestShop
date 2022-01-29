@@ -12,10 +12,9 @@ export class AppController {
     private readonly appService: AppService,
     private AppService: AppService,
     @Inject('SHOP_SERVICE') private client: ClientProxy,
-    @Inject('AUTH_SERVICE') private client2: ClientProxy,
   ) {}
 
-  @Roles(Role.Admin)
+  @Roles(Role.User)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   async getHello() {
