@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpStatus } from '@nestjs/common';
 import {
   Ctx,
   EventPattern,
@@ -20,7 +20,15 @@ export class AppController {
 
   @MessagePattern('auth/register')
   async registerUser(@Payload() userData: IUser) {
-    const res = await this.UsersService.register(userData);
+    const res = await this.UsersService.register(userData, true).catch(
+      (err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      },
+    );
     return res;
   }
 

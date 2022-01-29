@@ -1,35 +1,37 @@
+import { RoleService } from './../role/role.service';
 import { TokenService } from './../token/token.service';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Connection, Repository, QueryRunner } from 'typeorm';
 import { User } from './users.entity';
 import * as bcrypt from 'bcrypt';
 import IUser from './interfaces/IUserData';
 import IUserLogin from './interfaces/IUserLogin';
+import IUserDTO from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
+  private queryRunner: QueryRunner;
+
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private tokenService: TokenService,
-  ) {}
+    private roleService: RoleService,
+    private connection: Connection,
+  ) {
+    this.queryRunner = this.connection.createQueryRunner();
+  }
 
-  async register(userData: IUser): Promise<any> {
+  async register(userData: IUser, typeStatus: boolean): Promise<any> {
     const resCheckEmail = await this.findByEmail(userData.email);
-
-    if (!resCheckEmail.status) {
-      return resCheckEmail;
-    }
+    if (!resCheckEmail.status) return resCheckEmail;
 
     const resCheckPasswords = await this.equalPasswords(
       userData.password,
       userData.confirmPassword,
     );
-
-    if (!resCheckPasswords.status) {
-      return resCheckPasswords;
-    }
+    if (!resCheckPasswords.status) return resCheckPasswords;
 
     const hashPassword = await this.hashPassword(userData.password);
 
@@ -37,19 +39,39 @@ export class UsersService {
     userEntity.email = userData.email;
     userEntity.password = hashPassword;
 
-    const resInsered = await this.usersRepository.save(userEntity);
+    await this.queryRunner.connect();
+    await this.queryRunner.startTransaction();
 
-    const tokens = this.saveTokens(resInsered);
+    try {
+      const resInsered = await this.queryRunner.manager.save(User, userEntity);
+      let tokens;
 
-    return tokens;
+      if (!typeStatus) {
+        tokens = await this.registerTransaction(resInsered, userData.roleId);
+      } else {
+        const role = await this.roleService.getRoleByName(
+          process.env.BASE_USER_ROLE,
+        );
+        tokens = await this.registerTransaction(resInsered, role.id);
+      }
+      await this.queryRunner.commitTransaction();
+      return tokens;
+    } catch (e) {
+      await this.queryRunner.rollbackTransaction();
+      return {
+        status: false,
+        message: e.message,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    } finally {
+      await this.queryRunner.release();
+    }
   }
 
   async login(userData: IUserLogin) {
     const resCheckEmail = await this.findByEmail(userData.email);
 
-    if (resCheckEmail.status) {
-      return resCheckEmail;
-    }
+    if (resCheckEmail.status) return resCheckEmail;
 
     const resComparePasswords = await this.comparePassword(
       userData.password,
@@ -118,18 +140,42 @@ export class UsersService {
     };
   }
 
-  private convertUserDTO(userData: User) {
+  private convertUserDTO(userData: IUserDTO) {
     return {
       id: userData.id,
       email: userData.email,
+      role: userData.role,
     };
   }
 
-  private async saveTokens(resInsert: User) {
+  private async saveTokens(resInsert) {
     const tokens = await this.tokenService.generateTokens(
       this.convertUserDTO(resInsert),
     );
-    await this.tokenService.saveToken(resInsert.id, tokens.refreshToken);
+    await this.tokenService.saveToken(
+      resInsert.id,
+      tokens.refreshToken,
+      this.queryRunner.manager,
+    );
     return tokens;
+  }
+
+  private async registerTransaction(userData: User, roleId: number) {
+    const userRoleData = await this.roleService.addUserRole(
+      {
+        roleId: roleId,
+        userId: userData.id,
+      },
+      this.queryRunner.manager,
+    );
+
+    const roleData = await this.roleService.getRoleById(userRoleData.roleId);
+
+    return await this.saveTokens({
+      ...userData,
+      role: {
+        ...roleData,
+      },
+    });
   }
 }

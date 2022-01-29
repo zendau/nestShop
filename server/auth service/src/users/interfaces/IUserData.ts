@@ -1,5 +1,6 @@
-import { User } from '../users.entity';
-
-export default interface IUser extends User {
+export default interface IUser {
+  email: string;
+  password: string;
   confirmPassword: string;
+  roleId?: number;
 }

@@ -61,7 +61,7 @@ export class RoleController {
   }
 
   @MessagePattern('role/setUserRole')
-  async addUserRole(@Payload() userRoleData: UserRole) {
+  async addUserRole(@Payload() userRoleData?: UserRole) {
     const res = await this.roleService
       .addUserRole(userRoleData)
       .catch((err) => {

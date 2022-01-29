@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/users.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { UserRole } from './userRole.entity';
 import IEditUserData from './interfaces/IEditUserData';
 import { Role } from './role.entity';
+import { userRoleDataDTO } from './dto/userRole.dto';
 
 @Injectable()
 export class RoleService {
@@ -38,6 +39,24 @@ export class RoleService {
     return allRoles;
   }
 
+  async getRoleByName(name: string) {
+    const roleData = await this.rolesRepository
+      .createQueryBuilder()
+      .where('value = :name', { name })
+      .getOne();
+
+    return roleData;
+  }
+
+  async getRoleById(id: number) {
+    const roleData = await this.rolesRepository
+      .createQueryBuilder()
+      .where('id = :id', { id })
+      .getOne();
+
+    return roleData;
+  }
+
   async deleteRole(roleId: number) {
     console.log(roleId);
     const resDeleted = await this.rolesRepository
@@ -48,9 +67,11 @@ export class RoleService {
     return resDeleted;
   }
 
-  async addUserRole(userRoleData: UserRole) {
-    const res = await this.UserRoleRepository.save(userRoleData);
+  addUserRole(userRoleData: userRoleDataDTO, manager: EntityManager): any;
+  addUserRole(userRoleData: userRoleDataDTO): any;
 
+  async addUserRole(userRoleData?: userRoleDataDTO, manager?: EntityManager) {
+    const res = await manager.save(UserRole, userRoleData);
     return res;
   }
 
