@@ -69,31 +69,41 @@ export class UsersService {
   }
 
   async login(userData: IUserLogin) {
-    const resCheckEmail = await this.findByEmail(userData.email);
+    const resUserData = await this.findByEmail(userData.email);
 
-    if (resCheckEmail.status) return resCheckEmail;
+    if (resUserData.status) return resUserData;
 
     const resComparePasswords = await this.comparePassword(
       userData.password,
-      resCheckEmail.userData[0].password,
+      resUserData.userData.password,
     );
 
     if (!resComparePasswords.status) {
       return resComparePasswords;
     }
 
-    const tokens = this.saveTokens(resCheckEmail.userData[0]);
+    const tokens = this.saveTokens({
+      ...resUserData.userData,
+      role: resUserData.userData.roleId,
+    });
+
     return tokens;
   }
 
   private async findByEmail(email: string) {
-    const user = await this.usersRepository.find({
-      where: {
-        email,
-      },
-    });
+    const user = await this.usersRepository
+      .createQueryBuilder('u')
+      .leftJoinAndSelect('u.roleId', 'r')
+      .where('u.email = :email', { email })
+      .getOne();
+    // const user = await this.usersRepository.find({
+    //   where: {
+    //     email,
+    //   },
+    //   relations: ['role'],
+    // });
 
-    if (user.length > 0)
+    if (user !== null)
       return {
         status: false,
         message: `Email - ${email} is already registered`,
@@ -149,6 +159,7 @@ export class UsersService {
   }
 
   private async saveTokens(resInsert) {
+    console.log(resInsert);
     const tokens = await this.tokenService.generateTokens(
       this.convertUserDTO(resInsert),
     );

@@ -15,7 +15,7 @@ export class AppController {
     @Inject('AUTH_SERVICE') private client2: ClientProxy,
   ) {}
 
-  @Roles(Role.Admin, Role.User)
+  @Roles(Role.Admin)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
   async getHello() {
