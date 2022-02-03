@@ -1,12 +1,31 @@
 <template>
-  <div>
-    <div id="nav">
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </div>
-  <router-view/>
-  </div>
+  <component :is="getLayout">
+    <router-view/>
+  </component>
+  
 </template>
+
+<script>
+
+import mainLayout from "./layout/Main.layout.vue"
+import authLayout from "./layout/Auth.layout.vue"
+
+export default {
+  components: {
+    mainLayout
+  },
+  data() {
+    return {
+      authStatus: false
+    }
+  },
+  computed: {
+    getLayout() {
+      return this.authStatus ? authLayout : mainLayout
+    }
+  }
+}
+</script>
 
 <style>
 #app {
