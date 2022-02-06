@@ -19,8 +19,8 @@
       :validateError="v$.confirmPassword"
       v-model="confirmPassword"
     />
+    <!-- {{ $t('vuelidate.minLength', {nowLength: '22', mustLength: '20'})}} -->
     <button type="submit" class="btn btn-primary">Регистрация</button>
-
   </form>
 </template>
 
@@ -49,6 +49,8 @@ export default {
   inject: ['update'],
   methods: {
     async onSubmit() {
+      //console.log(this)
+      //this.$i18n.locale = 'ru'
       // this.$store.dispatch("updateStatus", {
       //   login: this.login,
       //   password: this.password

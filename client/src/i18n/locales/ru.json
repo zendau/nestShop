@@ -1,0 +1,11 @@
+{
+    "menu": {
+        "home": "Главная",
+        "login": "Вход",
+        "register": "Регистрация",
+        "user": "Пользователь"
+    },
+    "vuelidate": {
+        "minLength": "Это поле должно быть не менее {mustLength} символов, сейчас {nowLength}"
+    }
+}

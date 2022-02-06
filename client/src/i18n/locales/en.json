@@ -1,0 +1,11 @@
+{
+    "menu": {
+        "home": "Home",
+        "login": "Login",
+        "register": "Register",
+        "user": "User"
+    },
+    "vuelidate": {
+        "minLength": "This field should be at least {mustLength} long, now {nowLength}"
+    }
+}
