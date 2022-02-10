@@ -19,12 +19,10 @@ export class UsersService {
     private tokenService: TokenService,
     private roleService: RoleService,
     private connection: Connection,
-  ) {
-    this.queryRunner = this.connection.createQueryRunner();
-  }
+  ) {}
 
   async register(userData: IUser, typeStatus: boolean): Promise<any> {
-    const resCheckEmail = await this.findByEmail(userData.email);
+    const resCheckEmail = await this.checkEmail(userData.email);
     if (!resCheckEmail.status) return resCheckEmail;
 
     const resCheckPasswords = await this.equalPasswords(
@@ -39,6 +37,7 @@ export class UsersService {
     userEntity.email = userData.email;
     userEntity.password = hashPassword;
 
+    this.queryRunner = this.connection.createQueryRunner();
     await this.queryRunner.connect();
     await this.queryRunner.startTransaction();
 
@@ -65,13 +64,13 @@ export class UsersService {
       };
     } finally {
       await this.queryRunner.release();
+      this.queryRunner = null;
     }
   }
 
   async login(userData: IUserLogin) {
     const resUserData = await this.findByEmail(userData.email);
-
-    if (resUserData.status) return resUserData;
+    if (!resUserData.status) return resUserData;
 
     const resComparePasswords = await this.comparePassword(
       userData.password,
@@ -90,6 +89,25 @@ export class UsersService {
     return tokens;
   }
 
+  private async checkEmail(email: string) {
+    const user = await this.usersRepository.find({
+      where: {
+        email,
+      },
+    });
+
+    if (user.length === 0) {
+      return {
+        status: true,
+      };
+    }
+    return {
+      status: false,
+      message: `Email - ${email} is already registered`,
+      httpCode: HttpStatus.BAD_REQUEST,
+    };
+  }
+
   private async findByEmail(email: string) {
     const user: any = await this.usersRepository
       .createQueryBuilder('u')
@@ -98,24 +116,17 @@ export class UsersService {
       .innerJoinAndSelect('ur.role', 'r')
       .where('u.email = :email', { email })
       .getOne();
-    user.roleId = user.roleId[0].role;
-    // const user = await this.usersRepository.find({
-    //   where: {
-    //     email,
-    //   },
-    //   relations: ['role'],
-    // });
 
-    if (user !== null)
+    if (user !== undefined) {
+      user.roleId = user.roleId[0].role;
       return {
-        status: false,
-        message: `Email - ${email} is already registered`,
-        httpCode: HttpStatus.BAD_REQUEST,
+        status: true,
         userData: user,
       };
+    }
 
     return {
-      status: true,
+      status: false,
       message: `Email - ${email} is not found`,
       httpCode: HttpStatus.BAD_REQUEST,
     };
@@ -162,15 +173,10 @@ export class UsersService {
   }
 
   private async saveTokens(resInsert) {
-    console.log(resInsert);
     const tokens = await this.tokenService.generateTokens(
       this.convertUserDTO(resInsert),
     );
-    await this.tokenService.saveToken(
-      resInsert.id,
-      tokens.refreshToken,
-      this.queryRunner.manager,
-    );
+    await this.tokenService.saveToken(resInsert.id, tokens.refreshToken, null);
     return tokens;
   }
 

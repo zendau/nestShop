@@ -2,7 +2,7 @@
     <div class="mb-3">
         <label :for="id" class="form-label">{{title}}</label>
         <input  
-            type="text" 
+            :type="type" 
             class="form-control" 
             :id="id" 
             @input="$emit('update:modelValue', $event.target.value)" 
@@ -22,7 +22,7 @@
 
 <script>
 export default {
-    props: ['title', 'id', 'modelValue', 'descHelp', 'validateError'],
+    props: ['title', 'id', 'modelValue', 'descHelp', 'validateError', 'type'],
 }
 </script>
 

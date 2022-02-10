@@ -1,10 +1,12 @@
 <template>
-  <div :class="'alert alert-'+status" role="alert">
-    {{text}}
+  <div v-if='errorMessage.length > 0' :class="'alert alert-'+status" role="alert">
+    {{errorMessage}}
   </div>
 </template>
 
 <script>
+import {mapState} from 'vuex'
+
 export default {
     props: {
         status: {
@@ -14,11 +16,34 @@ export default {
             type: String,
             required: true,
         },
-        text: {
-            type: String,
+        timeout: {
+            type: Number,
             required: true
-        } 
-    }
+        }
+    },
+    data() {
+        return {
+            showAlert: false
+        }
+    },
+    created() {
+        console.log('created')
+    },
+    mounted() {
+        console.log('mounted')
+    },
+    updated() {
+        console.log('updated')
+        setTimeout(() => {
+            console.log(this.$store)
+            this.$store.commit('auth/clearErrorMessage')
+        }, this.timeout)
+    },
+        computed: {
+     ...mapState({
+      errorMessage: state =>  state.auth.error,
+  }),
+  },
 }
 </script>
 

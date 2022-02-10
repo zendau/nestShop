@@ -1,15 +1,18 @@
 <template>
   <form @submit.prevent="onSubmit">
+    <alert-message status="danger" :timeout="5000"/>
     <form-input 
-      id="login" 
-      title="Логин" 
-      descHelp='Логин выданный администатором виртуального магазина' 
-      v-model="login"
+      id="email" 
+      title="Email" 
+      :validateError="v$.email"
+      type='email'
+      v-model="email"
     />
     <form-input 
       id="password" 
-      title="Пароль" 
-      descHelp='Пароль выданный администатором виртуального магазина' 
+      title="Пароль"
+      type='password'
+      :validateError="v$.password"
       v-model="password"
     />
     <button type="submit" class="btn btn-primary">Войти</button>
@@ -18,32 +21,40 @@
 </template>
 
 <script>
+
 import FormInput from '../components/UI/FormInput.vue'
+import AlertMessage from "../components/UI/AlertMessage.vue"
+import useVuelidate from '@vuelidate/core'
+import { required, minLength, maxLength, email } from '@vuelidate/validators'
+
 export default {
-  components: { FormInput },
+  setup () {
+    return { v$: useVuelidate() }
+  },
+  components: { FormInput, AlertMessage },
   name: "login",
   data() {
     return {
-      login: "",
+      email: "",
       password: "",
     }
   },
-  inject: ['update'],
   methods: {
-    onSubmit() {
-      this.$store.dispatch("updateStatus", {
-        login: this.login,
-        password: this.password
-      }).then(() => {
-        const errorCode = this.$store.state.errorCode
-        
-        if (errorCode !== 0) {
-          this.update(true, errorCode)
-          this.$store.commit("updateErrorCode", 0)
-        } else {
-          this.$router.push("/shop")
-        }
-      })
+    async onSubmit() {
+      const result = await this.v$.$validate()
+      console.log(result)
+      if (result) {
+         this.$store.dispatch('auth/login', {
+          email: this.email,
+          password: this.password,
+        })
+      }
+    }
+  },
+  validations () {
+    return {
+      email: { required, minLength: minLength(6), maxLength: maxLength(20), email },
+      password: { required, minLength: minLength(6), maxLength: maxLength(20) },
     }
   }
 }

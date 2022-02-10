@@ -22,6 +22,7 @@ export class AppController {
   async registerUser(@Payload() userData: IUser) {
     const res = await this.UsersService.register(userData, true).catch(
       (err) => {
+        console.log(err);
         return {
           status: false,
           message: err.sqlMessage,

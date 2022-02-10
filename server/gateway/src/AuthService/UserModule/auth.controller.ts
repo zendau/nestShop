@@ -48,7 +48,7 @@ export class AuthController {
     const res = await firstValueFrom(
       this.authServiceClient.send('auth/login', authBody),
     );
-
+    console.log('rrr', res);
     if (res.status === false) {
       throw new HttpException(res.message, res.httpCode);
     }

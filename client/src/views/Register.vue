@@ -1,21 +1,24 @@
 <template>
   <form @submit.prevent="onSubmit">
-    <alert-message v-if="errorMessage" status="danger" :text='errorMessage'/>
+    <alert-message status="danger" :text='errorMessage' :timeout="5000"/>
     <form-input 
-      id="login" 
-      title="Логин" 
-      :validateError="v$.login"
-      v-model="login"
+      id="email" 
+      title="Email" 
+      :validateError="v$.email"
+      type='email'
+      v-model="email"
     />
     <form-input 
       id="password" 
       title="Пароль"
+      type='password'
       :validateError="v$.password"
       v-model="password"
     />
      <form-input 
-      id="password" 
+      id="confirmPassword" 
       title="Повторите пароль" 
+      type='password'
       :validateError="v$.confirmPassword"
       v-model="confirmPassword"
     />
@@ -25,57 +28,48 @@
 </template>
 
 <script>
-
+import {mapState} from 'vuex'
 import FormInput from '../components/UI/FormInput.vue'
 import AlertMessage from "../components/UI/AlertMessage.vue"
-
 import useVuelidate from '@vuelidate/core'
-import { required, sameAs, minLength, maxLength } from '@vuelidate/validators'
+import { required, sameAs, minLength, maxLength, email } from '@vuelidate/validators'
 
 export default {
   setup () {
     return { v$: useVuelidate() }
   },
   components: { FormInput, AlertMessage },
-  name: "login",
+  name: "register",
   data() {
     return {
-      login: "",
+      email: "",
       password: "",
       confirmPassword: "",
-      errorMessage: ""
     }
   },
-  inject: ['update'],
   methods: {
     async onSubmit() {
-      //console.log(this)
       //this.$i18n.locale = 'ru'
-      // this.$store.dispatch("updateStatus", {
-      //   login: this.login,
-      //   password: this.password
-      // }).then(() => {
-      //   const errorCode = this.$store.state.errorCode
-        
-      //   if (errorCode !== 0) {
-      //     this.update(true, errorCode)
-      //     this.$store.commit("updateErrorCode", 0)
-      //   } else {
-      //     this.$router.push("/shop")
-      //   }
-      // })
+
      const result = await this.v$.$validate()
       if (result) {
-        console.log('ok')
-        this.errorMessage = 'Данный email уже занят'
-        setTimeout(() => this.errorMessage = '', 2000)
+         this.$store.dispatch('auth/register', {
+          email: this.email,
+          password: this.password,
+          confirmPassword: this.confirmPassword
+        })
       }
     }
   },
+  computed: {
+     ...mapState({
+      errorMessage: state =>  state.auth.error,
+  }),
+  },
   validations () {
     return {
-      login: { required, minLength: minLength(4), maxLength: maxLength(20) }, // Matches this.firstName
-      password: { required, minLength: minLength(4), maxLength: maxLength(20) }, // Matches this.lastName
+      email: { required, minLength: minLength(6), maxLength: maxLength(20), email }, // Matches this.firstName
+      password: { required, minLength: minLength(6), maxLength: maxLength(20) }, // Matches this.lastName
       confirmPassword: {
         sameAs: sameAs(this.password)
       }

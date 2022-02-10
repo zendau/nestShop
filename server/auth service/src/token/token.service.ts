@@ -33,11 +33,12 @@ export class TokenService {
     return tokenData;
   }
 
-  async saveToken(
-    userId: number,
-    refreshToken: string,
-    manager: EntityManager,
-  ) {
+  saveToken(userId: number, refreshToken: string, manager: null);
+  saveToken(userId: number, refreshToken: string, manager: EntityManager);
+
+  async saveToken(userId: number, refreshToken: string, manager?: any) {
+    if (manager === null) manager = this.tokenRepository;
+
     const tokenData = await this.tokenRepository.findOne({
       where: {
         userId,
