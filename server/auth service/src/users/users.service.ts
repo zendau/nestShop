@@ -1,6 +1,6 @@
 import { RoleService } from './../role/role.service';
 import { TokenService } from './../token/token.service';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { forwardRef, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Connection, Repository, QueryRunner } from 'typeorm';
 import { User } from './users.entity';
@@ -8,6 +8,7 @@ import * as bcrypt from 'bcrypt';
 import IUser from './interfaces/IUserData';
 import IUserLogin from './interfaces/IUserLogin';
 import IUserDTO from './dto/user.dto';
+import e from 'express';
 
 @Injectable()
 export class UsersService {
@@ -84,6 +85,26 @@ export class UsersService {
     const tokens = this.saveTokens({
       ...resUserData.userData,
       role: resUserData.userData.roleId,
+    });
+
+    return tokens;
+  }
+
+  async refreshToken(refreshToken: string) {
+    const userTokenData = await this.tokenService.findTokenAndGet(refreshToken);
+
+    if (!userTokenData.status) {
+      return userTokenData;
+    }
+
+    const userCheck = await this.findByEmail(userTokenData.userData.email);
+
+    if (!userCheck.status) {
+      return userCheck;
+    }
+
+    const tokens = this.saveTokens({
+      ...userTokenData.userData,
     });
 
     return tokens;

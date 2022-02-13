@@ -10,12 +10,14 @@ import { AppService } from './app.service';
 import IUser from './users/interfaces/IUserData';
 import { User } from './users/users.entity';
 import { UsersService } from './users/users.service';
+import { TokenService } from './token/token.service';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
     private UsersService: UsersService,
+    private TokenService: TokenService,
   ) {}
 
   @MessagePattern('auth/register')
@@ -36,6 +38,12 @@ export class AppController {
   @MessagePattern('auth/login')
   async loginUser(@Payload() userData: IUser) {
     const res = await this.UsersService.login(userData);
+    return res;
+  }
+
+  @MessagePattern('auth/refresh')
+  async refresh(@Payload() refreshToken: string) {
+    const res = await this.UsersService.refreshToken(refreshToken);
     return res;
   }
 }

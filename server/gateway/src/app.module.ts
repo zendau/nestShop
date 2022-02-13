@@ -1,5 +1,6 @@
 import { RoleController } from './AuthService/RoleModule/role.controller';
 import { JwtStrategy } from './AuthService/strategies/jwt.strategy';
+import { RefreshStrategy } from './AuthService/strategies/refresh.strategy';
 import { AuthController } from './AuthService/UserModule/auth.controller';
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -36,7 +37,7 @@ import { ConfigModule } from '@nestjs/config';
     ]),
   ],
   controllers: [AppController, AuthController, RoleController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],
 })
 export class AppModule {}

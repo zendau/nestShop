@@ -7,11 +7,15 @@ import {
   HttpException,
   Inject,
   Post,
+  Req,
+  Res,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { Response, Request } from 'express';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+import { JwtRefreshGuard } from './../guards/jwt-refresh.guard';
 import { firstValueFrom } from 'rxjs';
 import { LoginData } from './dto/login.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -27,15 +31,19 @@ export class AuthController {
   @ApiResponse({ status: 400, type: HttpErrorDTO })
   @UsePipes(ValidationPipe)
   @Post('register')
-  async register(@Body() authBody: RegisterData) {
-    const res = await firstValueFrom(
+  async register(
+    @Body() authBody: RegisterData,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const resData = await firstValueFrom(
       this.authServiceClient.send('auth/register', authBody),
     );
 
-    if (res.status === false) {
-      throw new HttpException(res.message, res.httpCode);
+    if (resData.status === false) {
+      throw new HttpException(resData.message, resData.httpCode);
     }
-    console.log('1', res);
+
+    res.cookie('auth-cookie', resData.refreshToken, { httpOnly: true });
     return res;
   }
 
@@ -44,16 +52,38 @@ export class AuthController {
   @ApiResponse({ status: 400, type: HttpErrorDTO })
   @UsePipes(ValidationPipe)
   @Post('login')
-  async login(@Body() authBody: LoginData) {
-    const res = await firstValueFrom(
+  async login(
+    @Body() authBody: LoginData,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const resData = await firstValueFrom(
       this.authServiceClient.send('auth/login', authBody),
     );
-    console.log('rrr', res);
-    if (res.status === false) {
-      throw new HttpException(res.message, res.httpCode);
+    if (resData.status === false) {
+      throw new HttpException(resData.message, resData.httpCode);
     }
-    console.log('1', res);
-    return res;
+
+    res.cookie('auth-cookie', resData.refreshToken, { httpOnly: true });
+    return resData;
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Get('refresh')
+  async refresh(
+    @Req() request: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const authCookie = request.cookies['auth-cookie'];
+
+    const resData = await firstValueFrom(
+      this.authServiceClient.send('auth/refresh', authCookie),
+    );
+    if (resData.status === false) {
+      throw new HttpException(resData.message, resData.httpCode);
+    }
+
+    res.cookie('auth-cookie', resData.refreshToken, { httpOnly: true });
+    return resData;
   }
 
   @UseGuards(JwtAuthGuard)

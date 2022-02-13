@@ -1,15 +1,17 @@
+import { UsersService } from './../users/users.service';
 import { EntityManager, Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Token } from './token.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import e from 'express';
 
 @Injectable()
 export class TokenService {
   constructor(
-    private jwtService: JwtService,
     @InjectRepository(Token)
     private tokenRepository: Repository<Token>,
+    private jwtService: JwtService,
   ) {}
 
   generateTokens(payload) {
@@ -28,9 +30,27 @@ export class TokenService {
     };
   }
 
-  async findToken(refreshToken: string) {
+  async findTokenAndGet(refreshToken: string) {
     const tokenData = await this.tokenRepository.findOne({ refreshToken });
-    return tokenData;
+
+    if (tokenData === undefined) {
+      return {
+        status: false,
+        message: 'Not auth',
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    } else {
+      const userData = await this.jwtService.decode(tokenData.refreshToken);
+
+      if (typeof userData === 'object') {
+        return {
+          status: true,
+          userData: userData,
+        };
+      } else {
+        throw new Error('Not valid user refresh token data');
+      }
+    }
   }
 
   saveToken(userId: number, refreshToken: string, manager: null);
@@ -67,4 +87,18 @@ export class TokenService {
 
     return tokenData;
   }
+
+  // async refreshToken(refreshToken) {
+  //   const tokenData = await this.findToken(refreshToken);
+  //   if (tokenData === null) {
+  //     return {
+  //       status: false,
+  //       message: 'Token not found',
+  //       httpCode: HttpStatus.BAD_REQUEST,
+  //     };
+  //   }
+  //   //const userData = await this.jwtService.decode(refreshToken);
+
+  //   console.log(tokenData);
+  // }
 }
