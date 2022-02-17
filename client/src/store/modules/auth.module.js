@@ -58,9 +58,9 @@ export const auth = {
             const tokenDecode = jwt_decode(accessToken)
 
             commit('authSuccess', tokenDecode)
-            router.push('/user')
-        } catch (e) {
-            commit('authFailed', e.response.data)
+            //router.push('/user')
+        } catch {
+            return
         }
     }
   },
@@ -77,9 +77,9 @@ export const auth = {
         const msg = error.message
 
         if (typeof msg === 'string') {
-            state.error = error.message
+            state.error = msg
         } else {
-            state.error = error.message[0]
+            state.error = msg[0]
         }
     },
     logout(state) {

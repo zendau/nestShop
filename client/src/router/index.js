@@ -3,8 +3,10 @@ import Home from '../views/Home.vue'
 import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import User from '../views/User.vue'
+import Admin from '../views/Admin.vue'
 
 import $store from '../store'
+import { Role } from './roles'
 
 const routes = [
   {
@@ -39,6 +41,15 @@ const routes = [
       requiresAuth: true
     }
   },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: Admin,
+    meta: {
+      requiresAuth: true,
+      roles: [Role.Admin]
+    }
+  },
 ]
 
 const router = createRouter({
@@ -50,8 +61,11 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
 
   const authStatus = $store.state.auth.authStatus
+  //const role = $store.state.auth.user.role
   console.log('before router' , authStatus)
   // const auth = (localStorage.getItem("auth") === 'true')
+
+  //debugger
 
   if (to.path === "/") {
     if (authStatus) {
@@ -61,10 +75,27 @@ router.beforeEach(async (to, from, next) => {
     }
   } else {
     if (to.meta.requiresAuth === authStatus) {
+      
+      if (to.meta.roles?.length > 0) {
+        console.log('roles')
+      }
+
       next()
     } else if (to.meta.requiresAuth) {
-      $store.dispatch('auth/checkAuth')
-      next()
+
+      await $store.dispatch('auth/checkAuth')
+      if (to.meta.roles?.length > 0) {
+      
+        const res = to.meta.roles.includes($store.state.auth.user.role.value)
+
+        if (res) {
+          next()
+        } else {
+          next('/login')
+        }
+      } else {
+        next()
+      }
     } else {
 
       next({
