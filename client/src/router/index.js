@@ -4,6 +4,8 @@ import Login from '../views/Login.vue'
 import Register from '../views/Register.vue'
 import User from '../views/User.vue'
 
+import $store from '../store'
+
 const routes = [
   {
     path: '/',
@@ -45,20 +47,26 @@ const router = createRouter({
   linkExactActiveClass: "active"
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
 
-  const auth = (localStorage.getItem("auth") === 'true')
+  const authStatus = $store.state.auth.authStatus
+  console.log('before router' , authStatus)
+  // const auth = (localStorage.getItem("auth") === 'true')
 
   if (to.path === "/") {
-    if (auth) {
+    if (authStatus) {
       next("/user")
     } else {
       next('/login')
     }
   } else {
-    if (to.meta.requiresAuth === auth) {
+    if (to.meta.requiresAuth === authStatus) {
+      next()
+    } else if (to.meta.requiresAuth) {
+      $store.dispatch('auth/checkAuth')
       next()
     } else {
+
       next({
         path: "/",
         query: {

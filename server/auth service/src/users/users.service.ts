@@ -82,17 +82,19 @@ export class UsersService {
       return resComparePasswords;
     }
 
-    const tokens = this.saveTokens({
-      ...resUserData.userData,
-      role: resUserData.userData.roleId,
-    });
+    const tokens = this.saveTokens(
+      {
+        ...resUserData.userData,
+        role: resUserData.userData.roleId,
+      },
+      null,
+    );
 
     return tokens;
   }
 
   async refreshToken(refreshToken: string) {
     const userTokenData = await this.tokenService.findTokenAndGet(refreshToken);
-
     if (!userTokenData.status) {
       return userTokenData;
     }
@@ -103,9 +105,12 @@ export class UsersService {
       return userCheck;
     }
 
-    const tokens = this.saveTokens({
-      ...userTokenData.userData,
-    });
+    const tokens = this.saveTokens(
+      {
+        ...userTokenData.userData,
+      },
+      null,
+    );
 
     return tokens;
   }
@@ -193,11 +198,15 @@ export class UsersService {
     };
   }
 
-  private async saveTokens(resInsert) {
+  private async saveTokens(resInsert, manager: any) {
     const tokens = await this.tokenService.generateTokens(
       this.convertUserDTO(resInsert),
     );
-    await this.tokenService.saveToken(resInsert.id, tokens.refreshToken, null);
+    await this.tokenService.saveToken(
+      resInsert.id,
+      tokens.refreshToken,
+      manager,
+    );
     return tokens;
   }
 
@@ -212,11 +221,14 @@ export class UsersService {
 
     const roleData = await this.roleService.getRoleById(userRoleData.roleId);
 
-    return await this.saveTokens({
-      ...userData,
-      role: {
-        ...roleData,
+    return await this.saveTokens(
+      {
+        ...userData,
+        role: {
+          ...roleData,
+        },
       },
-    });
+      this.queryRunner.manager,
+    );
   }
 }

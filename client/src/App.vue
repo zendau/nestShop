@@ -21,8 +21,11 @@ export default {
   },
   computed: {
     getLayout() {
-      return this.authStatus ? authLayout : mainLayout
+      return this.$store.state.auth.authStatus ? authLayout : mainLayout
     }
+  },
+  async mounted() {
+    console.log(this.$store.state)    
   }
 }
 </script>

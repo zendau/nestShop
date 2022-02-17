@@ -32,6 +32,7 @@ export class AppController {
         };
       },
     );
+    console.log(res);
     return res;
   }
 

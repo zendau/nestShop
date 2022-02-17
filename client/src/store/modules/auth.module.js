@@ -1,14 +1,18 @@
 import $api from "../../axios";
 import jwt_decode from "jwt-decode";
 
+import router from '../../router'
+
 export const auth = {
   namespaced: true,
   state: {
     user: {
         id: null,
         login: null,
-        email: null
+        email: null,
+        role: []
     },
+    authStatus: false,
     error: ""
   },
   actions: {
@@ -18,17 +22,18 @@ export const auth = {
                 email: loginData.email,
                 password: loginData.password
             })
-            console.log('res', resData)
 
             const tokenDecode = jwt_decode(resData.data.accessToken)
-            console.log('token', tokenDecode)
-            commit('loginSuccess', tokenDecode)
+            commit('authSuccess', tokenDecode)
+            router.push('/user')
         } catch (e) {
-            console.log('e', e)
-            commit('loginFailed', e.response.data)
+            commit('authFailed', e.response.data)
         }
     },
-    logout() {
+    logout({ commit }) {
+        localStorage.removeItem('token');
+        commit('logout')
+
     },
     async register({ commit }, registerData) {
         try {
@@ -37,21 +42,38 @@ export const auth = {
                 password: registerData.password,
                 confirmPassword: registerData.confirmPassword
             })
-            console.log('res', resData)
 
             const tokenDecode = jwt_decode(resData.data.accessToken)
 
-            commit('registerSuccess', tokenDecode)
+            commit('authSuccess', tokenDecode)
+            router.push('/user')
         } catch (e) {
-            commit('registerFailed', e.response.data)
+            commit('authFailed', e.response.data)
+        }
+    },
+    async checkAuth({ commit }) {
+        try {
+            const resData = await $api.get('/auth/refresh')
+            const accessToken = resData.data.accessToken
+            const tokenDecode = jwt_decode(accessToken)
+
+            commit('authSuccess', tokenDecode)
+            router.push('/user')
+        } catch (e) {
+            commit('authFailed', e.response.data)
         }
     }
   },
   mutations: {
-    loginSuccess(state, userData) {
-        console.log(userData, state)
+    authSuccess(state, userData) {
+        state.user = {
+            id: userData.id,
+            email: userData.email,
+            role: userData.role
+        }
+        state.authStatus = true
     },
-    loginFailed(state, error) {
+    authFailed(state, error) {
         const msg = error.message
 
         if (typeof msg === 'string') {
@@ -60,19 +82,15 @@ export const auth = {
             state.error = error.message[0]
         }
     },
-    logout() {
-    },
-    registerSuccess(state, userData) {
-        console.log(userData, state)
-    },
-    registerFailed(state, error) {
-        const msg = error.message
-
-        if (typeof msg === 'string') {
-            state.error = error.message
-        } else {
-            state.error = error.message[0]
-        }
+    logout(state) {
+        state.user = {
+            id: null,
+            login: null,
+            email: null,
+            role: []
+        },
+        state.authStatus = false,
+        state.error = ""
     },
     clearErrorMessage(state) {
         state.error = ""

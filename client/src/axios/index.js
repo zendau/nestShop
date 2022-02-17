@@ -23,14 +23,14 @@ $api.interceptors.response.use((config) => {
 
     const originalRequest = error.config;
 
-    if (originalRequest.url === "/user/refresh")  {
+    if (originalRequest.url === "/auth/refresh")  {
         return error.response
     }
 
     if (error.response.status == 401 && error.config && !error.config._isRetry) {
         originalRequest._isRetry = true;
         try {
-            const response = await axios.get(`${API_URL}/user/refresh`, {withCredentials: true})
+            const response = await axios.get(`${API_URL}/auth/refresh`, {withCredentials: true})
             localStorage.setItem('token', response.data.accessToken);
             return $api.request(originalRequest);
         } catch (e) {

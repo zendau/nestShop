@@ -53,7 +53,7 @@ export default {
 
      const result = await this.v$.$validate()
       if (result) {
-         this.$store.dispatch('auth/register', {
+         await this.$store.dispatch('auth/register', {
           email: this.email,
           password: this.password,
           confirmPassword: this.confirmPassword

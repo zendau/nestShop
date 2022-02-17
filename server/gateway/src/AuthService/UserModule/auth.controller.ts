@@ -44,7 +44,7 @@ export class AuthController {
     }
 
     res.cookie('auth-cookie', resData.refreshToken, { httpOnly: true });
-    return res;
+    return resData;
   }
 
   @ApiOperation({ summary: 'Login user' })
@@ -82,7 +82,7 @@ export class AuthController {
       throw new HttpException(resData.message, resData.httpCode);
     }
 
-    res.cookie('auth-cookie', resData.refreshToken, { httpOnly: true });
+    res.cookie('auth-cookie', resData.refreshToken, { httpOnly: false });
     return resData;
   }
 
