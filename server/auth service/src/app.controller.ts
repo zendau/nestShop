@@ -47,4 +47,9 @@ export class AppController {
     const res = await this.UsersService.refreshToken(refreshToken);
     return res;
   }
+
+  @MessagePattern('auth/test')
+  async test() {
+    return 'test';
+  }
 }

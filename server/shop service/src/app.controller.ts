@@ -1,16 +1,21 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Inject } from '@nestjs/common';
 import {
+  ClientProxy,
   Ctx,
   EventPattern,
   MessagePattern,
   Payload,
   RmqContext,
 } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
 import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    @Inject('AUTH_SERVICE') private authServiceClient: ClientProxy,
+  ) {}
 
   @Get()
   getHello(): string {
@@ -18,9 +23,11 @@ export class AppController {
   }
 
   @MessagePattern('test')
-  async handleUserCreated(@Payload() data: string, @Ctx() context: RmqContext) {
-    console.log(data);
-    console.log(context);
-    return data;
+  async handleUserCreated(@Payload() data: string) {
+    const resData = await firstValueFrom(
+      this.authServiceClient.send('auth/test', 'message'),
+    );
+    console.log(resData);
+    return resData;
   }
 }

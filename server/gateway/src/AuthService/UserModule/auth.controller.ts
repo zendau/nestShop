@@ -24,7 +24,10 @@ import { HttpErrorDTO } from '../dto/httpError.dto';
 @ApiTags('Auth microservice - User controller')
 @Controller('auth')
 export class AuthController {
-  constructor(@Inject('AUTH_SERVICE') private authServiceClient: ClientProxy) {}
+  constructor(
+    @Inject('AUTH_SERVICE') private authServiceClient: ClientProxy,
+    @Inject('SHOP_SERVICE') private shopServiceClient: ClientProxy,
+  ) {}
 
   @ApiOperation({ summary: 'Register new user' })
   @ApiResponse({ status: 200, type: RegisterData })
@@ -90,5 +93,13 @@ export class AuthController {
   @Get('user')
   async userInfo() {
     return 'hello, user';
+  }
+
+  @Get('test')
+  async test() {
+    const resData = await firstValueFrom(
+      this.shopServiceClient.send('test', 'message'),
+    );
+    return resData;
   }
 }
