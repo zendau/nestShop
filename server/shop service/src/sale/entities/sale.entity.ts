@@ -7,7 +7,9 @@ export class Sale {
   @PrimaryGeneratedColumn()
   id: number;
 
-   @OneToMany(() => Merchandise, (Merchandise) => Merchandise.id)
+  @OneToMany(() => Merchandise, (Merchandise) => Merchandise.id, {
+    cascade: true,
+  })
   merchandiseId: Merchandise[];
 
   @Column()
@@ -19,6 +21,8 @@ export class Sale {
   @Column()
   count: number;
 
-  @OneToMany(() => Worker, (Worker) => Worker.workerId)
+  @OneToMany(() => Worker, (Worker) => Worker.workerId, {
+    cascade: true,
+  })
   workerId: Worker[];
 }
