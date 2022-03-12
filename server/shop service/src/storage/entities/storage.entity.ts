@@ -18,6 +18,8 @@ export class Storage {
   @ManyToMany(() => Worker, (Worker) => Worker.workerId, {
     cascade: true,
   })
-  @JoinTable()
+  @JoinTable({
+    name: 'storagesWorkers',
+  })
   workerId: Worker[];
 }

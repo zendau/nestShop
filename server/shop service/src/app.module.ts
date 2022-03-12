@@ -12,22 +12,35 @@ import { ProviderModule } from './provider/provider.module';
 import { SaleModule } from './sale/sale.module';
 import { CategoryModule } from './category/category.module';
 import { MerchandiseModule } from './merchandise/merchandise.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     ClientsModule.register([
       {
-        name: 'SHOP_SERVICE',
+        name: 'AUTH_SERVICE',
         transport: Transport.RMQ,
         options: {
           urls: ['amqp://user:root@localhost:5672'],
-          queue: 'shop_queue',
+          queue: 'auth_queue',
           queueOptions: {
             durable: false,
           },
         },
       },
     ]),
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      host: process.env.DATABASE_HOST,
+      port: parseInt(process.env.DATABASE_PORT),
+      username: process.env.DATABASE_USER,
+      password: process.env.DATABASE_PASSWORD,
+      database: process.env.DATABASE_NAME,
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
     CategoryModule,
     SaleModule,
     ProviderModule,
