@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Worker } from './../../worker/entities/worker.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 @Entity()
 export class Storage {
@@ -8,6 +15,9 @@ export class Storage {
   @Column()
   address: string;
 
-//   @OneToMany(() => Category, (Category) => Category.name)
-//   workerId: Category[];
+  @ManyToMany(() => Worker, (Worker) => Worker.workerId, {
+    cascade: true,
+  })
+  @JoinTable()
+  workerId: Worker[];
 }

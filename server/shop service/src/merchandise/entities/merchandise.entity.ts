@@ -9,7 +9,9 @@ export class Merchandise {
   @Column()
   name: string;
 
-  @OneToMany(() => Category, (Category) => Category.name)
+  @OneToMany(() => Category, (Category) => Category.name, {
+    cascade: true,
+  })
   category: Category[];
 
   @Column()
