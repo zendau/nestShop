@@ -1,26 +1,63 @@
-import { Injectable } from '@nestjs/common';
-import { CreateProviderDto } from './dto/create-provider.dto';
-import { UpdateProviderDto } from './dto/update-provider.dto';
+import { Provider } from './entities/provider.entity';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { IProviderDTO, IEditProviderDTO } from './dto/provider.dto';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ProviderService {
-  create(createProviderDto: CreateProviderDto) {
-    return 'This action adds a new provider';
+  constructor(
+    @InjectRepository(Provider)
+    private provideRepository: Repository<Provider>,
+  ) {}
+
+  async create(createProviderDto: IProviderDTO) {
+    const resInsered = await this.provideRepository.save(createProviderDto);
+    return resInsered;
   }
 
-  findAll() {
-    return `This action returns all provider`;
+  async getAll() {
+    return await this.provideRepository.createQueryBuilder().getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} provider`;
+  async getById(id: number) {
+    console.log(id);
+    const res = await this.provideRepository
+      .createQueryBuilder()
+      .where('id = :id', { id })
+      .getOne();
+
+    if (res === undefined)
+      return {
+        status: false,
+        message: `id ${id} is not valid`,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return res;
   }
 
-  update(id: number, updateProviderDto: UpdateProviderDto) {
-    return `This action updates a #${id} provider`;
+  async update(updateProviderDTO: IEditProviderDTO) {
+    const res = await this.provideRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        name: updateProviderDTO.name,
+        phone: updateProviderDTO.phone,
+      })
+      .where(`id = ${updateProviderDTO.id}`)
+      .execute();
+
+    return !!res.affected;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} provider`;
+  async remove(id: number) {
+    const res = await this.provideRepository
+      .createQueryBuilder()
+      .delete()
+      .where(`id = ${id}`)
+      .execute();
+
+    return !!res.affected;
   }
 }

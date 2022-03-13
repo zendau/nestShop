@@ -1,3 +1,4 @@
+import { ProviderController } from './ShopService/ProviderModule/provider.controller';
 import { RoleController } from './AuthService/RoleModule/role.controller';
 import { JwtStrategy } from './AuthService/strategies/jwt.strategy';
 import { RefreshStrategy } from './AuthService/strategies/refresh.strategy';
@@ -36,7 +37,12 @@ import { ConfigModule } from '@nestjs/config';
       },
     ]),
   ],
-  controllers: [AppController, AuthController, RoleController],
+  controllers: [
+    AppController,
+    AuthController,
+    RoleController,
+    ProviderController,
+  ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],
 })
