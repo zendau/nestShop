@@ -8,6 +8,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { WorkerRoleController } from './ShopService/RoleModule/role.controller';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthController,
     RoleController,
     ProviderController,
+    WorkerRoleController,
   ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],

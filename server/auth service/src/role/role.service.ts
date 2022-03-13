@@ -58,7 +58,6 @@ export class RoleService {
   }
 
   async deleteRole(roleId: number) {
-    console.log(roleId);
     const resDeleted = await this.rolesRepository
       .createQueryBuilder()
       .delete()

@@ -1,26 +1,63 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { IRoleDTO, IEditRoleDTO } from './dto/role.dto';
+import { Role } from './entities/role.entity';
 
 @Injectable()
 export class RoleService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  constructor(
+    @InjectRepository(Role)
+    private roleRepository: Repository<Role>,
+  ) {}
+
+  async create(createRoleDto: IRoleDTO) {
+    console.log('111');
+    const resInsered = await this.roleRepository.save(createRoleDto);
+    return resInsered;
   }
 
-  findAll() {
-    return `This action returns all role`;
+  async getAll() {
+    return await this.roleRepository.createQueryBuilder().getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} role`;
+  async getById(id: number) {
+    const res = await this.roleRepository
+      .createQueryBuilder()
+      .where('id = :id', { id })
+      .getOne();
+
+    if (res === undefined)
+      return {
+        status: false,
+        message: `id ${id} is not valid`,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return res;
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(updateRoleDTO: IEditRoleDTO) {
+    const res = await this.roleRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        roleName: updateRoleDTO.roleName,
+        description: updateRoleDTO.description,
+      })
+      .where(`id = ${updateRoleDTO.id}`)
+      .execute();
+
+    return !!res.affected;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} role`;
+  async remove(id: number) {
+    const res = await this.roleRepository
+      .createQueryBuilder()
+      .delete()
+      .where(`id = ${id}`)
+      .execute();
+
+    return !!res.affected;
   }
 }

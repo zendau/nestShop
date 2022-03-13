@@ -1,9 +1,9 @@
-import { Controller, Body, HttpStatus } from '@nestjs/common';
+import { Body, Controller, HttpStatus } from '@nestjs/common';
 import { ProviderService } from './provider.service';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { IProviderDTO, IEditProviderDTO } from './dto/provider.dto';
 
-@Controller('provider')
+@Controller()
 export class ProviderController {
   constructor(private readonly providerService: ProviderService) {}
 
