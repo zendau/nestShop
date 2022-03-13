@@ -1,3 +1,4 @@
+import { CategoryController } from './ShopService/CategoryModule/category.controller';
 import { ProviderController } from './ShopService/ProviderModule/provider.controller';
 import { RoleController } from './AuthService/RoleModule/role.controller';
 import { JwtStrategy } from './AuthService/strategies/jwt.strategy';
@@ -44,6 +45,7 @@ import { WorkerRoleController } from './ShopService/RoleModule/role.controller';
     RoleController,
     ProviderController,
     WorkerRoleController,
+    CategoryController,
   ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],
