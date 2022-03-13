@@ -1,26 +1,62 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Category } from './entities/category.entity';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { ICategoryDTO, IEditCategoryDTO } from './dto/category.dto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CategoryService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  constructor(
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
+  ) {}
+
+  async create(createCategoryDTO: ICategoryDTO) {
+    const resInsered = await this.categoryRepository.save(createCategoryDTO);
+    return resInsered;
   }
 
-  findAll() {
-    return `This action returns all category`;
+  async getAll() {
+    return await this.categoryRepository.createQueryBuilder().getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async getById(id: number) {
+    const res = await this.categoryRepository
+      .createQueryBuilder()
+      .where('id = :id', { id })
+      .getOne();
+
+    if (res === undefined)
+      return {
+        status: false,
+        message: `id ${id} is not valid`,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return res;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+  async update(updateCategoryDTO: IEditCategoryDTO) {
+    const res = await this.categoryRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        name: updateCategoryDTO.name,
+        description: updateCategoryDTO.description,
+      })
+      .where(`id = ${updateCategoryDTO.id}`)
+      .execute();
+
+    return !!res.affected;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: number) {
+    const res = await this.categoryRepository
+      .createQueryBuilder()
+      .delete()
+      .where(`id = ${id}`)
+      .execute();
+
+    return !!res.affected;
   }
 }
