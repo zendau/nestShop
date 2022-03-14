@@ -1,3 +1,4 @@
+import { waybillController } from './ShopService/WaybillModule/waybill.controller';
 import { WorkerController } from './ShopService/WorkerModule/worker.controller';
 import { MerchandiseController } from './ShopService/MerchandiseModule/merchandise.controller';
 import { CategoryController } from './ShopService/CategoryModule/category.controller';
@@ -50,6 +51,7 @@ import { WorkerRoleController } from './ShopService/RoleModule/role.controller';
     CategoryController,
     MerchandiseController,
     WorkerController,
+    waybillController,
   ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],

@@ -1,42 +1,73 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Body, HttpStatus } from '@nestjs/common';
 import { WaybillService } from './waybill.service';
-import { CreateWaybillDto } from './dto/create-waybill.dto';
-import { UpdateWaybillDto } from './dto/update-waybill.dto';
+import { IWaybillDTO, IEditWaybillDTO } from './dto/waybill.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('waybill')
 export class WaybillController {
   constructor(private readonly waybillService: WaybillService) {}
 
-  @Post()
-  create(@Body() createWaybillDto: CreateWaybillDto) {
-    return this.waybillService.create(createWaybillDto);
+  @MessagePattern('waybill/add')
+  async addWaybill(@Body() createWaybillData: IWaybillDTO) {
+    const res = await this.waybillService
+      .create(createWaybillData)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.waybillService.findAll();
+  @MessagePattern('waybill/getAll')
+  async getAllWaybills() {
+    const res = await this.waybillService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.waybillService.findOne(+id);
+  @MessagePattern('waybill/get')
+  async getWaybill(@Payload() waybillId: number) {
+    const res = await this.waybillService.getById(waybillId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWaybillDto: UpdateWaybillDto) {
-    return this.waybillService.update(+id, updateWaybillDto);
+  @MessagePattern('waybill/edit')
+  async editWaybill(@Body() updateWaybillDto: IEditWaybillDTO) {
+    const res = await this.waybillService
+      .update(updateWaybillDto)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.waybillService.remove(+id);
+  @MessagePattern('waybill/delete')
+  async deleteWaybill(@Payload() waybillId: number) {
+    const res = await this.waybillService.remove(waybillId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 }
