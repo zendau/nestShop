@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { WaybillService } from './waybill.service';
 import { CreateWaybillDto } from './dto/create-waybill.dto';
 import { UpdateWaybillDto } from './dto/update-waybill.dto';

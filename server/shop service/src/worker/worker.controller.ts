@@ -1,34 +1,74 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Body, HttpStatus } from '@nestjs/common';
 import { WorkerService } from './worker.service';
-import { CreateWorkerDto } from './dto/create-worker.dto';
-import { UpdateWorkerDto } from './dto/update-worker.dto';
+import { IWorkerDTO, IEditWorkerDTO } from './dto/worker.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
 @Controller('worker')
 export class WorkerController {
   constructor(private readonly workerService: WorkerService) {}
 
-  @Post()
-  create(@Body() createWorkerDto: CreateWorkerDto) {
-    return this.workerService.create(createWorkerDto);
+  @MessagePattern('worker/add')
+  async addWorker(@Body() createWorkerData: IWorkerDTO) {
+    console.log(createWorkerData);
+    const res = await this.workerService
+      .create(createWorkerData)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.workerService.findAll();
+  @MessagePattern('worker/getAll')
+  async getAllWorkers() {
+    const res = await this.workerService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.workerService.findOne(+id);
+  @MessagePattern('worker/get')
+  async getWorker(@Payload() workerId: number) {
+    const res = await this.workerService.getById(workerId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateWorkerDto: UpdateWorkerDto) {
-    return this.workerService.update(+id, updateWorkerDto);
+  @MessagePattern('worker/edit')
+  async editWorker(@Body() updateWorkerDto: IEditWorkerDTO) {
+    const res = await this.workerService
+      .update(updateWorkerDto)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.workerService.remove(+id);
+  @MessagePattern('worker/delete')
+  async deleteWorker(@Payload() workerId: number) {
+    const res = await this.workerService.remove(workerId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 }
