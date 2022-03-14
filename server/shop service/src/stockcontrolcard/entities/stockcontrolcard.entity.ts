@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   OneToMany,
   JoinColumn,
+  ManyToOne,
 } from 'typeorm';
 
 @Entity()
@@ -50,7 +51,7 @@ export class Stockcontrolcard {
   })
   saleId: number;
 
-  @OneToMany(() => Sale, (Sale) => Sale.id, {
+  @ManyToOne(() => Sale, (Sale) => Sale.id, {
     cascade: true,
   })
   @JoinColumn({ name: 'saleId' })
