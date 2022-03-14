@@ -10,5 +10,4 @@ export class Role {
 
   @Column()
   description: string;
-
 }

@@ -1,5 +1,5 @@
 import { Role } from './../../role/entities/role.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Worker {
@@ -24,8 +24,8 @@ export class Worker {
   @Column()
   salary: number;
 
-  @OneToMany(() => Role, (Role) => Role.id, {
+  @ManyToOne(() => Role, (Role) => Role.id, {
     cascade: true,
   })
-  workerRole: Role[];
+  workerRole: Role;
 }

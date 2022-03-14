@@ -1,26 +1,100 @@
-import { Injectable } from '@nestjs/common';
-import { CreateWorkerDto } from './dto/create-worker.dto';
-import { UpdateWorkerDto } from './dto/update-worker.dto';
+import { RoleService } from './../role/role.service';
+import { HttpStatus, Injectable } from '@nestjs/common';
+import { IWorkerDTO, IEditWorkerDTO } from './dto/worker.dto';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from 'src/role/entities/role.entity';
+import { Worker } from './entities/worker.entity';
 
 @Injectable()
 export class WorkerService {
-  create(createWorkerDto: CreateWorkerDto) {
-    return 'This action adds a new worker';
+  constructor(
+    @InjectRepository(Worker)
+    private workerRepository: Repository<Worker>,
+    private roleService: RoleService,
+  ) {}
+
+  async create(createWorkerDTO: IWorkerDTO) {
+    const workerRole = await this.roleService.getById(
+      createWorkerDTO.workerRole,
+    );
+
+    if (workerRole instanceof Role) {
+      const workerEntity = this.workerRepository.create();
+      workerEntity.userId = createWorkerDTO.userId;
+      workerEntity.name = createWorkerDTO.name;
+      workerEntity.birtday = createWorkerDTO.birtday;
+      workerEntity.phone = createWorkerDTO.phone;
+      workerEntity.address = createWorkerDTO.address;
+      workerEntity.salary = createWorkerDTO.salary;
+      workerEntity.workerRole = workerRole;
+
+      const resInsered = await this.workerRepository.save(workerEntity);
+      return resInsered;
+    } else {
+      workerRole.message = `Worker role ${workerRole.message}`;
+      return workerRole;
+    }
   }
 
-  findAll() {
-    return `This action returns all worker`;
+  async getAll() {
+    return await this.workerRepository
+      .createQueryBuilder('w')
+      .innerJoinAndSelect('w.workerRole', 'workerRole')
+      .getMany();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} worker`;
+  async getById(id: number) {
+    const res = await this.workerRepository
+      .createQueryBuilder('w')
+      .innerJoinAndSelect('w.workerRole', 'workerRole')
+      .where('w.workerId = :id', { id })
+      .getOne();
+
+    if (res === undefined)
+      return {
+        status: false,
+        message: `id ${id} is not valid`,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+
+    return res;
   }
 
-  update(id: number, updateWorkerDto: UpdateWorkerDto) {
-    return `This action updates a #${id} worker`;
+  async update(updateWorkerDTO: IEditWorkerDTO) {
+    const workerRole = await this.roleService.getById(
+      updateWorkerDTO.workerRole,
+    );
+
+    if (workerRole instanceof Role) {
+      const res = await this.workerRepository
+        .createQueryBuilder()
+        .update()
+        .set({
+          userId: updateWorkerDTO.userId,
+          name: updateWorkerDTO.name,
+          birtday: updateWorkerDTO.birtday,
+          phone: updateWorkerDTO.phone,
+          address: updateWorkerDTO.address,
+          salary: updateWorkerDTO.salary,
+          workerRole: workerRole,
+        })
+        .where(`workerId = ${updateWorkerDTO.workerId}`)
+        .execute();
+      return !!res.affected;
+    } else {
+      workerRole.message = `Category ${workerRole.message}`;
+      return workerRole;
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} worker`;
+  async remove(id: number) {
+    const res = await this.workerRepository
+      .createQueryBuilder()
+      .delete()
+      .where(`workerId = ${id}`)
+      .execute();
+
+    return !!res.affected;
   }
 }

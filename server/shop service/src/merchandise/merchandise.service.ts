@@ -15,13 +15,13 @@ export class MerchandiseService {
   ) {}
 
   async create(createMerchandiseDTO: IMerchandiseDTO) {
-    const userCategory = await this.categoryService.getById(
+    const itemCategory = await this.categoryService.getById(
       createMerchandiseDTO.categoryId,
     );
 
-    if (userCategory instanceof Category) {
+    if (itemCategory instanceof Category) {
       const merchandiseEntity = this.merchandiseRepository.create();
-      merchandiseEntity.categoryId = userCategory;
+      merchandiseEntity.categoryId = itemCategory;
       merchandiseEntity.description = createMerchandiseDTO.description;
       merchandiseEntity.image = createMerchandiseDTO.image;
       merchandiseEntity.name = createMerchandiseDTO.name;
@@ -31,8 +31,8 @@ export class MerchandiseService {
       );
       return resInsered;
     } else {
-      userCategory.message = `Category ${userCategory.message}`;
-      return userCategory;
+      itemCategory.message = `Category ${itemCategory.message}`;
+      return itemCategory;
     }
   }
 
@@ -61,16 +61,16 @@ export class MerchandiseService {
   }
 
   async update(updateMerchandiseDTO: IEditMerchandiseDTO) {
-    const userCategory = await this.categoryService.getById(
+    const itemCategory = await this.categoryService.getById(
       updateMerchandiseDTO.categoryId,
     );
 
-    if (userCategory instanceof Category) {
+    if (itemCategory instanceof Category) {
       const res = await this.merchandiseRepository
         .createQueryBuilder()
         .update()
         .set({
-          categoryId: userCategory,
+          categoryId: itemCategory,
           name: updateMerchandiseDTO.name,
           image: updateMerchandiseDTO.image,
           description: updateMerchandiseDTO.description,
@@ -80,8 +80,8 @@ export class MerchandiseService {
       console.log(res);
       return !!res.affected;
     } else {
-      userCategory.message = `Category ${userCategory.message}`;
-      return userCategory;
+      itemCategory.message = `Category ${itemCategory.message}`;
+      return itemCategory;
     }
   }
 
