@@ -1,21 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { StockcontrolcardService } from './stockcontrolcard.service';
 import { CreateStockcontrolcardDto } from './dto/create-stockcontrolcard.dto';
 import { UpdateStockcontrolcardDto } from './dto/update-stockcontrolcard.dto';
 
 @Controller('stockcontrolcard')
 export class StockcontrolcardController {
-  constructor(
-    private readonly stockcontrolcardService: StockcontrolcardService,
-  ) {}
+  constructor(private readonly stockcontrolcardService: StockcontrolcardService) {}
 
   @Post()
   create(@Body() createStockcontrolcardDto: CreateStockcontrolcardDto) {
@@ -33,10 +23,7 @@ export class StockcontrolcardController {
   }
 
   @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateStockcontrolcardDto: UpdateStockcontrolcardDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateStockcontrolcardDto: UpdateStockcontrolcardDto) {
     return this.stockcontrolcardService.update(+id, updateStockcontrolcardDto);
   }
 

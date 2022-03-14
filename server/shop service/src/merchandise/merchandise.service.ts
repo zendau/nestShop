@@ -15,13 +15,13 @@ export class MerchandiseService {
   ) {}
 
   async create(createMerchandiseDTO: IMerchandiseDTO) {
-    const itemCategory = await this.categoryService.getById(
+    const userCategory = await this.categoryService.getById(
       createMerchandiseDTO.categoryId,
     );
 
-    if (itemCategory instanceof Category) {
+    if (userCategory instanceof Category) {
       const merchandiseEntity = this.merchandiseRepository.create();
-      merchandiseEntity.categoryId = itemCategory;
+      merchandiseEntity.categoryId = userCategory;
       merchandiseEntity.description = createMerchandiseDTO.description;
       merchandiseEntity.image = createMerchandiseDTO.image;
       merchandiseEntity.name = createMerchandiseDTO.name;
@@ -31,8 +31,8 @@ export class MerchandiseService {
       );
       return resInsered;
     } else {
-      itemCategory.message = `Category ${itemCategory.message}`;
-      return itemCategory;
+      userCategory.message = `Category ${userCategory.message}`;
+      return userCategory;
     }
   }
 
@@ -61,16 +61,16 @@ export class MerchandiseService {
   }
 
   async update(updateMerchandiseDTO: IEditMerchandiseDTO) {
-    const itemCategory = await this.categoryService.getById(
+    const userCategory = await this.categoryService.getById(
       updateMerchandiseDTO.categoryId,
     );
 
-    if (itemCategory instanceof Category) {
+    if (userCategory instanceof Category) {
       const res = await this.merchandiseRepository
         .createQueryBuilder()
         .update()
         .set({
-          categoryId: itemCategory,
+          categoryId: userCategory,
           name: updateMerchandiseDTO.name,
           image: updateMerchandiseDTO.image,
           description: updateMerchandiseDTO.description,
@@ -80,8 +80,8 @@ export class MerchandiseService {
       console.log(res);
       return !!res.affected;
     } else {
-      itemCategory.message = `Category ${itemCategory.message}`;
-      return itemCategory;
+      userCategory.message = `Category ${userCategory.message}`;
+      return userCategory;
     }
   }
 
