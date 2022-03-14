@@ -1,3 +1,4 @@
+import { MerchandiseController } from './ShopService/MerchandiseModule/merchandise.controller';
 import { CategoryController } from './ShopService/CategoryModule/category.controller';
 import { ProviderController } from './ShopService/ProviderModule/provider.controller';
 import { RoleController } from './AuthService/RoleModule/role.controller';
@@ -46,6 +47,7 @@ import { WorkerRoleController } from './ShopService/RoleModule/role.controller';
     ProviderController,
     WorkerRoleController,
     CategoryController,
+    MerchandiseController,
   ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],
