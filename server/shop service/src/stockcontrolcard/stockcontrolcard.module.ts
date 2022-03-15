@@ -2,10 +2,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Module } from '@nestjs/common';
 import { StockcontrolcardService } from './stockcontrolcard.service';
 import { StockcontrolcardController } from './stockcontrolcard.controller';
-import { Stockcontrolcard } from './entities/stockcontrolcard.entity';
+import { StockControlCard } from './entities/stockcontrolcard.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Stockcontrolcard])],
+  imports: [TypeOrmModule.forFeature([StockControlCard])],
   controllers: [StockcontrolcardController],
   providers: [StockcontrolcardService],
 })

@@ -1,3 +1,4 @@
+import { SaleController } from './ShopService/SaleModule/sale.controller';
 import { StorageController } from './ShopService/StorageModule/storage.controller';
 import { WaybillController } from './ShopService/WaybillModule/waybill.controller';
 import { WorkerController } from './ShopService/WorkerModule/worker.controller';
@@ -54,6 +55,7 @@ import { WorkerRoleController } from './ShopService/RoleModule/role.controller';
     WorkerController,
     WaybillController,
     StorageController,
+    SaleController,
   ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],

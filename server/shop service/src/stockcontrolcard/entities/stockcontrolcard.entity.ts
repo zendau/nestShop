@@ -12,7 +12,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Stockcontrolcard {
+export class StockControlCard {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -31,29 +31,23 @@ export class Stockcontrolcard {
   @Column()
   place: string;
 
-  @OneToMany(() => Waybill, (Waybill) => Waybill.id, {
+  @ManyToOne(() => Waybill, (Waybill) => Waybill.id, {
     cascade: true,
   })
-  waybillId: number;
+  waybillId: Waybill;
 
-  @OneToMany(() => Merchandise, (Merchandise) => Merchandise.id, {
+  @ManyToOne(() => Merchandise, (Merchandise) => Merchandise.id, {
     cascade: true,
   })
-  MerchandiseId: number;
+  MerchandiseId: Merchandise;
 
-  @OneToMany(() => Storage, (Storage) => Storage.id, {
+  @ManyToOne(() => Storage, (Storage) => Storage.id, {
     cascade: true,
   })
-  storageId: Storage[];
-
-  @Column({
-    nullable: true,
-  })
-  saleId: number;
+  storageId: Storage;
 
   @ManyToOne(() => Sale, (Sale) => Sale.id, {
     cascade: true,
   })
-  @JoinColumn({ name: 'saleId' })
-  sale: Sale[];
+  saleId: Sale;
 }

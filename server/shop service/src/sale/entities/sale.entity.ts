@@ -1,16 +1,17 @@
 import { Merchandise } from './../../merchandise/entities/merchandise.entity';
 import { Worker } from './../../worker/entities/worker.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 
 @Entity()
 export class Sale {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(() => Merchandise, (Merchandise) => Merchandise.id, {
+  @ManyToOne(() => Merchandise, (Merchandise) => Merchandise.id, {
     cascade: true,
   })
-  merchandiseId: Merchandise[];
+  @JoinColumn({ name: 'merchandiseId' })
+  merchandiseId: Merchandise;
 
   @Column()
   dateOfSale: Date;
@@ -21,8 +22,9 @@ export class Sale {
   @Column()
   count: number;
 
-  @OneToMany(() => Worker, (Worker) => Worker.workerId, {
+  @ManyToOne(() => Worker, (Worker) => Worker.workerId, {
     cascade: true,
   })
-  workerId: Worker[];
+  @JoinColumn({ name: 'workerId' })
+  workerId: Worker;
 }

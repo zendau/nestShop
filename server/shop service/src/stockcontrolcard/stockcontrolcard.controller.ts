@@ -8,8 +8,10 @@ import {
   Delete,
 } from '@nestjs/common';
 import { StockcontrolcardService } from './stockcontrolcard.service';
-import { CreateStockcontrolcardDto } from './dto/create-stockcontrolcard.dto';
-import { UpdateStockcontrolcardDto } from './dto/update-stockcontrolcard.dto';
+import {
+  IStockControlCardDTO,
+  IEditStockControlCardDTO,
+} from './dto/stockcontrolcard.dto';
 
 @Controller('stockcontrolcard')
 export class StockcontrolcardController {
@@ -18,7 +20,7 @@ export class StockcontrolcardController {
   ) {}
 
   @Post()
-  create(@Body() createStockcontrolcardDto: CreateStockcontrolcardDto) {
+  create(@Body() createStockcontrolcardDto: IStockControlCardDTO) {
     return this.stockcontrolcardService.create(createStockcontrolcardDto);
   }
 
@@ -35,7 +37,7 @@ export class StockcontrolcardController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Body() updateStockcontrolcardDto: UpdateStockcontrolcardDto,
+    @Body() updateStockcontrolcardDto: IEditStockControlCardDTO,
   ) {
     return this.stockcontrolcardService.update(+id, updateStockcontrolcardDto);
   }
