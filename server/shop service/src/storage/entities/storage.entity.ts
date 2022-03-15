@@ -19,7 +19,9 @@ export class Storage {
     cascade: true,
   })
   @JoinTable({
-    name: 'storagesWorkers',
+    name: 'storagesWorker',
+    joinColumn: { name: 'storageId' },
+    inverseJoinColumn: { name: 'workerId' },
   })
-  workerId: Worker[];
+  workers: Worker[];
 }

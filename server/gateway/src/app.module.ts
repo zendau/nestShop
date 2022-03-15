@@ -1,4 +1,5 @@
-import { waybillController } from './ShopService/WaybillModule/waybill.controller';
+import { StorageController } from './ShopService/StorageModule/storage.controller';
+import { WaybillController } from './ShopService/WaybillModule/waybill.controller';
 import { WorkerController } from './ShopService/WorkerModule/worker.controller';
 import { MerchandiseController } from './ShopService/MerchandiseModule/merchandise.controller';
 import { CategoryController } from './ShopService/CategoryModule/category.controller';
@@ -51,7 +52,8 @@ import { WorkerRoleController } from './ShopService/RoleModule/role.controller';
     CategoryController,
     MerchandiseController,
     WorkerController,
-    waybillController,
+    WaybillController,
+    StorageController,
   ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],

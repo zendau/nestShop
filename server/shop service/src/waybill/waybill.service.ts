@@ -95,7 +95,6 @@ export class WaybillService {
           })
           .where(`id = ${updateWaybillDTO.id}`)
           .execute();
-        console.log(res);
         return !!res.affected;
       } else {
         provideData.message = `Provide ${provideData.message}`;

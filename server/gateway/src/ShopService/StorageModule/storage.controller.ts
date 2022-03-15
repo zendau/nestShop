@@ -1,5 +1,5 @@
-import { editWaybillDTO } from './dto/editWaybill.dto';
-import { waybillDTO } from './dto/waybill.dto';
+import { editStorageDTO } from './dto/editStorage.dto';
+import { storageDTO } from './dto/storage.dto';
 import {
   Body,
   Controller,
@@ -18,15 +18,15 @@ import { firstValueFrom } from 'rxjs';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HttpErrorDTO } from 'src/AuthService/dto/httpError.dto';
 @ApiTags('Auth microservice - Role controller')
-@Controller('waybill')
-export class WaybillController {
+@Controller('storage')
+export class StorageController {
   constructor(@Inject('SHOP_SERVICE') private shopServiceClient: ClientProxy) {}
 
   @UsePipes(ValidationPipe)
   @Post('add')
-  async addWaybill(@Body() createWaybillDTO: waybillDTO) {
+  async addStorage(@Body() createStorageDTO: storageDTO) {
     const res = await firstValueFrom(
-      this.shopServiceClient.send('waybill/add', createWaybillDTO),
+      this.shopServiceClient.send('storage/add', createStorageDTO),
     );
     if (res.status === false) {
       throw new HttpException(res.message, res.httpCode);
@@ -36,10 +36,9 @@ export class WaybillController {
 
   @UsePipes(ValidationPipe)
   @Patch('edit')
-  async editWaybill(@Body() updatewaybillDTO: editWaybillDTO) {
-    console.log(updatewaybillDTO);
+  async editStorage(@Body() updateStorageDTO: editStorageDTO) {
     const res = await firstValueFrom(
-      this.shopServiceClient.send('waybill/edit', updatewaybillDTO),
+      this.shopServiceClient.send('storage/edit', updateStorageDTO),
     );
     if (res.status === false) {
       throw new HttpException(res.message, res.httpCode);
@@ -49,9 +48,9 @@ export class WaybillController {
 
   @UsePipes(ValidationPipe)
   @Get('get/:id')
-  async getWaybill(@Param() params) {
+  async getStorage(@Param() params) {
     const res = await firstValueFrom(
-      this.shopServiceClient.send('waybill/get', params.id),
+      this.shopServiceClient.send('storage/get', params.id),
     );
     if (res.status === false) {
       throw new HttpException(res.message, res.httpCode);
@@ -61,9 +60,9 @@ export class WaybillController {
 
   @UsePipes(ValidationPipe)
   @Get('getAll')
-  async getAllWaybills() {
+  async getAllStorages() {
     const res = await firstValueFrom(
-      this.shopServiceClient.send('waybill/getAll', ''),
+      this.shopServiceClient.send('storage/getAll', ''),
     );
     if (res.status === false) {
       throw new HttpException(res.message, res.httpCode);
@@ -73,9 +72,9 @@ export class WaybillController {
 
   @UsePipes(ValidationPipe)
   @Delete('delete/:id')
-  async deleteWaybill(@Param() params) {
+  async deleteStorage(@Param() params) {
     const res = await firstValueFrom(
-      this.shopServiceClient.send('waybill/delete', params.id),
+      this.shopServiceClient.send('storage/delete', params.id),
     );
     if (res.status === false) {
       throw new HttpException(res.message, res.httpCode);

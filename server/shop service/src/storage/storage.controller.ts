@@ -1,42 +1,74 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Body, HttpStatus } from '@nestjs/common';
 import { StorageService } from './storage.service';
-import { CreateStorageDto } from './dto/create-storage.dto';
-import { UpdateStorageDto } from './dto/update-storage.dto';
+import { IStorageDTO, IEditStorageDTO } from './dto/storage.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
-@Controller('storage')
+@Controller()
 export class StorageController {
   constructor(private readonly storageService: StorageService) {}
 
-  @Post()
-  create(@Body() createStorageDto: CreateStorageDto) {
-    return this.storageService.create(createStorageDto);
+  @MessagePattern('storage/add')
+  async addStorage(@Body() createStorageData: IStorageDTO) {
+    const res = await this.storageService
+      .create(createStorageData)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.storageService.findAll();
+  @MessagePattern('storage/getAll')
+  async getAllStorages() {
+    const res = await this.storageService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.storageService.findOne(+id);
+  @MessagePattern('storage/get')
+  async getStorage(@Payload() storageId: number) {
+    const res = await this.storageService.getById(storageId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateStorageDto: UpdateStorageDto) {
-    return this.storageService.update(+id, updateStorageDto);
+  @MessagePattern('storage/edit')
+  async editStorage(@Body() updateStorageDTO: IEditStorageDTO) {
+    const res = await this.storageService
+      .update(updateStorageDTO)
+      .catch((err) => {
+        console.log(err);
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.storageService.remove(+id);
+  @MessagePattern('storage/delete')
+  async deleteStorage(@Payload() storageId: number) {
+    const res = await this.storageService.remove(storageId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 }

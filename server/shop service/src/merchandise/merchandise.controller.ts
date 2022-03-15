@@ -8,7 +8,7 @@ export class MerchandiseController {
   constructor(private readonly merchandiseService: MerchandiseService) {}
 
   @MessagePattern('merchandise/add')
-  async addCategory(@Body() createMerchandiseData: IMerchandiseDTO) {
+  async addMerchandise(@Body() createMerchandiseData: IMerchandiseDTO) {
     const res = await this.merchandiseService
       .create(createMerchandiseData)
       .catch((err) => {
@@ -22,7 +22,7 @@ export class MerchandiseController {
   }
 
   @MessagePattern('merchandise/getAll')
-  async getAllCategories() {
+  async getAllMerchandises() {
     const res = await this.merchandiseService.getAll().catch((err) => {
       return {
         status: false,
@@ -34,7 +34,7 @@ export class MerchandiseController {
   }
 
   @MessagePattern('merchandise/get')
-  async getCategory(@Payload() merchandiseId: number) {
+  async getMerchandise(@Payload() merchandiseId: number) {
     const res = await this.merchandiseService
       .getById(merchandiseId)
       .catch((err) => {
