@@ -10,5 +10,6 @@ import { Waybill } from './entities/waybill.entity';
   imports: [TypeOrmModule.forFeature([Waybill]), WorkerModule, ProviderModule],
   controllers: [WaybillController],
   providers: [WaybillService],
+  exports: [WaybillService],
 })
 export class WaybillModule {}

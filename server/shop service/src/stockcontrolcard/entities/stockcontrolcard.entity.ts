@@ -1,14 +1,13 @@
-import { Sale } from './../../sale/entities/sale.entity';
-import { Storage } from './../../storage/entities/storage.entity';
-import { Merchandise } from './../../merchandise/entities/merchandise.entity';
-import { Waybill } from './../../waybill/entities/waybill.entity';
+import { Sale } from '../../sale/entities/sale.entity';
+import { Storage } from '../../storage/entities/storage.entity';
+import { Merchandise } from '../../merchandise/entities/merchandise.entity';
+import { Waybill } from '../../waybill/entities/waybill.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  OneToMany,
-  JoinColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
@@ -25,7 +24,7 @@ export class StockControlCard {
   @Column()
   arrivedDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   issueDate: Date;
 
   @Column()
@@ -34,20 +33,24 @@ export class StockControlCard {
   @ManyToOne(() => Waybill, (Waybill) => Waybill.id, {
     cascade: true,
   })
+  @JoinColumn({ name: 'waybillId' })
   waybillId: Waybill;
 
   @ManyToOne(() => Merchandise, (Merchandise) => Merchandise.id, {
     cascade: true,
   })
+  @JoinColumn({ name: 'MerchandiseId' })
   MerchandiseId: Merchandise;
 
   @ManyToOne(() => Storage, (Storage) => Storage.id, {
     cascade: true,
   })
+  @JoinColumn({ name: 'storageId' })
   storageId: Storage;
 
   @ManyToOne(() => Sale, (Sale) => Sale.id, {
     cascade: true,
   })
+  @JoinColumn({ name: 'saleId' })
   saleId: Sale;
 }

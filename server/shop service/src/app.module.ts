@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { AdminModule } from './admin/admin.module';
 import { RoleModule } from './role/role.module';
 import { WorkerModule } from './worker/worker.module';
-import { StockcontrolcardModule } from './stockcontrolcard/stockcontrolcard.module';
+import { StockcontrolcardModule } from './stockControlCard/stockControlCard.module';
 import { StorageModule } from './storage/storage.module';
 import { WaybillModule } from './waybill/waybill.module';
 import { ProviderModule } from './provider/provider.module';

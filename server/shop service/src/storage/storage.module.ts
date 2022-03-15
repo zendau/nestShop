@@ -9,5 +9,6 @@ import { Storage } from './entities/storage.entity';
   imports: [TypeOrmModule.forFeature([Storage]), WorkerModule],
   controllers: [StorageController],
   providers: [StorageService],
+  exports: [StorageService],
 })
 export class StorageModule {}
