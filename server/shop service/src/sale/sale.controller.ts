@@ -1,34 +1,69 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Body, HttpStatus } from '@nestjs/common';
 import { SaleService } from './sale.service';
-import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
+import { ISaleDTO, IEditSaleDTO } from './dto/sale.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
-@Controller('sale')
+@Controller()
 export class SaleController {
   constructor(private readonly saleService: SaleService) {}
 
-  @Post()
-  create(@Body() createSaleDto: CreateSaleDto) {
-    return this.saleService.create(createSaleDto);
+  @MessagePattern('sale/add')
+  async addSale(@Body() createSaleData: ISaleDTO) {
+    const res = await this.saleService.create(createSaleData).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.saleService.findAll();
+  @MessagePattern('sale/getAll')
+  async getAllSales() {
+    const res = await this.saleService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.saleService.findOne(+id);
+  @MessagePattern('sale/get')
+  async getSale(@Payload() saleId: number) {
+    const res = await this.saleService.getById(saleId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSaleDto: UpdateSaleDto) {
-    return this.saleService.update(+id, updateSaleDto);
+  @MessagePattern('sale/edit')
+  async editSale(@Body() updateSaleDTO: IEditSaleDTO) {
+    const res = await this.saleService.update(updateSaleDTO).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.saleService.remove(+id);
+  @MessagePattern('sale/delete')
+  async deleteSale(@Payload() saleId: number) {
+    const res = await this.saleService.remove(saleId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 }

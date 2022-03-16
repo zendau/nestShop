@@ -1,5 +1,12 @@
 import { Category } from './../../category/entities/category.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
 
 @Entity()
 export class Merchandise {
@@ -9,10 +16,11 @@ export class Merchandise {
   @Column()
   name: string;
 
-  @OneToMany(() => Category, (Category) => Category.name, {
+  @ManyToOne(() => Category, (Category) => Category.name, {
     cascade: true,
   })
-  category: Category[];
+  @JoinColumn({ name: 'categoryId' })
+  categoryId: Category;
 
   @Column()
   image: string;

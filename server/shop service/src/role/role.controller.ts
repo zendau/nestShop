@@ -1,34 +1,70 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, HttpStatus } from '@nestjs/common';
 import { RoleService } from './role.service';
-import { CreateRoleDto } from './dto/create-role.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { IRoleDTO, IEditRoleDTO } from './dto/role.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
-@Controller('role')
+@Controller()
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
-  @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.roleService.create(createRoleDto);
+  @MessagePattern('workerRole/add')
+  async addRole(@Body() createRoleData: IRoleDTO) {
+    console.log(createRoleData);
+    const res = await this.roleService.create(createRoleData).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.roleService.findAll();
+  @MessagePattern('workerRole/getAll')
+  async getAllRoles() {
+    const res = await this.roleService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.roleService.findOne(+id);
+  @MessagePattern('workerRole/get')
+  async getRole(@Payload() roleId: number) {
+    const res = await this.roleService.getById(roleId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.roleService.update(+id, updateRoleDto);
+  @MessagePattern('workerRole/edit')
+  async editRole(@Body() updateRoleDto: IEditRoleDTO) {
+    const res = await this.roleService.update(updateRoleDto).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.roleService.remove(+id);
+  @MessagePattern('workerRole/delete')
+  async deleteRole(@Payload() roleId: number) {
+    const res = await this.roleService.remove(roleId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 }

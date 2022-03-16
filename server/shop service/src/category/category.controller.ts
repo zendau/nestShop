@@ -1,34 +1,73 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Body, HttpStatus } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CategoryService } from './category.service';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ICategoryDTO, IEditCategoryDTO } from './dto/category.dto';
 
-@Controller('category')
+@Controller()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoryService.create(createCategoryDto);
+  @MessagePattern('category/add')
+  async addCategory(@Body() createCategoryData: ICategoryDTO) {
+    const res = await this.categoryService
+      .create(createCategoryData)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.categoryService.findAll();
+  @MessagePattern('category/getAll')
+  async getAllCategories() {
+    const res = await this.categoryService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoryService.findOne(+id);
+  @MessagePattern('category/get')
+  async getCategory(@Payload() categoryId: number) {
+    const res = await this.categoryService.getById(categoryId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    return this.categoryService.update(+id, updateCategoryDto);
+  @MessagePattern('category/edit')
+  async editCategory(@Body() updateCategoryDTO: IEditCategoryDTO) {
+    const res = await this.categoryService
+      .update(updateCategoryDTO)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoryService.remove(+id);
+  @MessagePattern('category/delete')
+  async deleteCategory(@Payload() categoryId: number) {
+    const res = await this.categoryService.remove(categoryId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 }

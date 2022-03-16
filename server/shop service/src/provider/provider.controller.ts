@@ -1,34 +1,73 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, HttpStatus } from '@nestjs/common';
 import { ProviderService } from './provider.service';
-import { CreateProviderDto } from './dto/create-provider.dto';
-import { UpdateProviderDto } from './dto/update-provider.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
+import { IProviderDTO, IEditProviderDTO } from './dto/provider.dto';
 
-@Controller('provider')
+@Controller()
 export class ProviderController {
   constructor(private readonly providerService: ProviderService) {}
 
-  @Post()
-  create(@Body() createProviderDto: CreateProviderDto) {
-    return this.providerService.create(createProviderDto);
+  @MessagePattern('provider/add')
+  async addProvider(@Body() createProviderData: IProviderDTO) {
+    const res = await this.providerService
+      .create(createProviderData)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.providerService.findAll();
+  @MessagePattern('provider/getAll')
+  async getAllProviders() {
+    const res = await this.providerService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.providerService.findOne(+id);
+  @MessagePattern('provider/get')
+  async getProvider(@Payload() providerId: number) {
+    const res = await this.providerService.getById(providerId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProviderDto: UpdateProviderDto) {
-    return this.providerService.update(+id, updateProviderDto);
+  @MessagePattern('provider/edit')
+  async editProvider(@Body() updateProviderDto: IEditProviderDTO) {
+    const res = await this.providerService
+      .update(updateProviderDto)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.providerService.remove(+id);
+  @MessagePattern('provider/delete')
+  async deleteProvider(@Payload() providerId: number) {
+    const res = await this.providerService.remove(providerId).catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 }

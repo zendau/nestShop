@@ -1,3 +1,11 @@
+import { StockControlCardController } from './ShopService/StockControlCardModule/stockControlCard.controller';
+import { SaleController } from './ShopService/SaleModule/sale.controller';
+import { StorageController } from './ShopService/StorageModule/storage.controller';
+import { WaybillController } from './ShopService/WaybillModule/waybill.controller';
+import { WorkerController } from './ShopService/WorkerModule/worker.controller';
+import { MerchandiseController } from './ShopService/MerchandiseModule/merchandise.controller';
+import { CategoryController } from './ShopService/CategoryModule/category.controller';
+import { ProviderController } from './ShopService/ProviderModule/provider.controller';
 import { RoleController } from './AuthService/RoleModule/role.controller';
 import { JwtStrategy } from './AuthService/strategies/jwt.strategy';
 import { RefreshStrategy } from './AuthService/strategies/refresh.strategy';
@@ -7,6 +15,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { WorkerRoleController } from './ShopService/RoleModule/role.controller';
 
 @Module({
   imports: [
@@ -36,7 +45,20 @@ import { ConfigModule } from '@nestjs/config';
       },
     ]),
   ],
-  controllers: [AppController, AuthController, RoleController],
+  controllers: [
+    AppController,
+    AuthController,
+    RoleController,
+    ProviderController,
+    WorkerRoleController,
+    CategoryController,
+    MerchandiseController,
+    WorkerController,
+    WaybillController,
+    StorageController,
+    SaleController,
+    StockControlCardController,
+  ],
   providers: [AppService, JwtStrategy, RefreshStrategy],
   exports: [ClientsModule],
 })

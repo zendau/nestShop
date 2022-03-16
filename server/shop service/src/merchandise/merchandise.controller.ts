@@ -1,34 +1,77 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Body, HttpStatus } from '@nestjs/common';
 import { MerchandiseService } from './merchandise.service';
-import { CreateMerchandiseDto } from './dto/create-merchandise.dto';
-import { UpdateMerchandiseDto } from './dto/update-merchandise.dto';
+import { IMerchandiseDTO, IEditMerchandiseDTO } from './dto/merchandise.dto';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 
-@Controller('merchandise')
+@Controller()
 export class MerchandiseController {
   constructor(private readonly merchandiseService: MerchandiseService) {}
 
-  @Post()
-  create(@Body() createMerchandiseDto: CreateMerchandiseDto) {
-    return this.merchandiseService.create(createMerchandiseDto);
+  @MessagePattern('merchandise/add')
+  async addMerchandise(@Body() createMerchandiseData: IMerchandiseDTO) {
+    const res = await this.merchandiseService
+      .create(createMerchandiseData)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Get()
-  findAll() {
-    return this.merchandiseService.findAll();
+  @MessagePattern('merchandise/getAll')
+  async getAllMerchandises() {
+    const res = await this.merchandiseService.getAll().catch((err) => {
+      return {
+        status: false,
+        message: err.sqlMessage,
+        httpCode: HttpStatus.BAD_REQUEST,
+      };
+    });
+    return res;
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.merchandiseService.findOne(+id);
+  @MessagePattern('merchandise/get')
+  async getMerchandise(@Payload() merchandiseId: number) {
+    const res = await this.merchandiseService
+      .getById(merchandiseId)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMerchandiseDto: UpdateMerchandiseDto) {
-    return this.merchandiseService.update(+id, updateMerchandiseDto);
+  @MessagePattern('merchandise/edit')
+  async editMerchandise(@Body() updateMerchandiseDTO: IEditMerchandiseDTO) {
+    const res = await this.merchandiseService
+      .update(updateMerchandiseDTO)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.merchandiseService.remove(+id);
+  @MessagePattern('merchandise/delete')
+  async deleteMerchandise(@Payload() merchandiseId: number) {
+    const res = await this.merchandiseService
+      .remove(merchandiseId)
+      .catch((err) => {
+        return {
+          status: false,
+          message: err.sqlMessage,
+          httpCode: HttpStatus.BAD_REQUEST,
+        };
+      });
+    return res;
   }
 }
